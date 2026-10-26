@@ -26,7 +26,7 @@ export async function evaluateEvcEligibility(db: Db, app: AppRow) {
     basis: 'APH',
     reference: cat.route.aphReference,
     passed: cat.route.evc === 'YES',
-    detail: cat.route.evc === 'YES' ? 'Table 2.3 / Chapter I lists an EVC step.' : 'This category has no EVC step; it goes to the authorised decision stage instead.',
+    detail: cat.route.evc === 'YES' ? 'This category\'s processing route includes an EVC step.' : 'This category has no EVC step; it goes to the authorised decision stage instead.',
   });
   add({
     id: 'SCRUTINY_IN_ORDER',
@@ -72,7 +72,7 @@ export async function evaluateEvcEligibility(db: Db, app: AppRow) {
     basis: 'SYSTEM_POLICY',
     reference: 'Catalogue verification status',
     passed: cat.verificationStatus === 'VERIFIED',
-    detail: cat.verificationStatus === 'VERIFIED' ? 'Checklist verified against the APH.' : 'Category pending regulatory verification.',
+    detail: cat.verificationStatus === 'VERIFIED' ? 'Checklist verified.' : 'Category pending regulatory verification.',
   });
   const unresolved = conds.filter((c) => !c.passed);
   return {

@@ -165,8 +165,8 @@ async function issueNotice(t: Db, storage: Storage, app: AppRow, u: AuthUser, ki
     nextSteps: [
       'Open the application in your portal dashboard (Deficiencies tab).',
       'For each deficiency, upload the corrected / replacement document or update the named field, and record a response.',
-      'Submit all corrections for re-scrutiny. The Re-Scrutiny Committee verifies only the deficiencies listed in this notice (Ch. I §1.8(g)).',
-      'Deadlines marked "operational" are system-configured and are not APH-prescribed. Missing a deadline does not change your application automatically; an official decides the next step.',
+      'Submit all corrections for re-scrutiny. The Re-Scrutiny Committee verifies only the deficiencies listed in this notice.',
+      'Deadlines marked "operational" are system-configured. Missing a deadline does not change your application automatically; an official decides the next step.',
     ],
     supersedes: prev ? `${prev.notice_no} v${prev.version}` : null,
     disclaimer: DISCLAIMER,
@@ -205,7 +205,7 @@ async function insertDraftDeficiency(t: Db, app: AppRow, u: AuthUser, cat: Retur
     const ok = b.targetType === 'FIELD' ? cat.fields.some((f) => f.id === b.targetId) : cat.documents.some((d) => d.id === b.targetId);
     if (!ok) throw new HttpError(400, 'INVALID_TARGET', 'The affected field/document does not belong to this application type.');
   }
-  if (b.deadlineType === 'NOT_CONFIGURED' && b.deadline) throw new HttpError(400, 'DEADLINE_TYPE', 'Choose a deadline type (APH or operational) when setting a deadline.');
+  if (b.deadlineType === 'NOT_CONFIGURED' && b.deadline) throw new HttpError(400, 'DEADLINE_TYPE', 'Choose a deadline type (regulatory or operational) when setting a deadline.');
   if (b.deadlineType !== 'NOT_CONFIGURED' && (!b.deadline || !b.deadlineBasis))
     throw new HttpError(400, 'DEADLINE_BASIS_REQUIRED', 'A deadline needs a date and its basis. The portal does not invent statutory deadlines.');
   if (b.deadline && b.deadline < todayIST()) throw new HttpError(400, 'DEADLINE_PAST', 'The deadline cannot be in the past.');
@@ -716,7 +716,7 @@ export function officialRouter(db: Db, storage: Storage) {
     ah(async (_req, res) => {
       const policies = await db.query('SELECT * FROM operational_policies ORDER BY key');
       const history = await db.query('SELECT h.*, uu.full_name AS changed_by_name FROM operational_policy_history h LEFT JOIN users uu ON uu.id = h.changed_by ORDER BY h.id DESC LIMIT 100');
-      res.json({ policies, history, note: 'Operational configuration — not APH requirements. Values drive reminders and follow-up deadlines only.' });
+      res.json({ policies, history, note: 'Operational configuration. Values drive reminders and follow-up deadlines only.' });
     }),
   );
   r.put(
@@ -866,7 +866,7 @@ export function officialRouter(db: Db, storage: Storage) {
       const routeAfterScrutiny = async (t: Db) => {
         const next = afterScrutiny(cat.route);
         if (next === 'AWAITING_AUTHORISED_DECISION') {
-          await transition(t, req, { id: null, role: 'SYSTEM' }, app, 'ROUTE_TO_DECISION', { to: next }, 'Routed for authorised decision (Table 2.3: no EVC for this category)');
+          await transition(t, req, { id: null, role: 'SYSTEM' }, app, 'ROUTE_TO_DECISION', { to: next }, 'Routed for authorised decision (no EVC step for this category)');
           await notifyDecisionStage(t, app, 'STAGE_READY', `${app.reference_no} ready for decision`, cat.title);
         } else {
           result.evcEligibility = await evaluateEvcEligibility(t, app);
@@ -1053,7 +1053,7 @@ export function officialRouter(db: Db, storage: Storage) {
           if (!(new Date(b.scheduledEnd) > new Date(b.scheduledStart))) throw new HttpError(400, 'INVALID_TIME_RANGE', 'The end time must be after the start time.');
           if (b.mode === 'PHYSICAL' && !b.location) throw new HttpError(400, 'LOCATION_REQUIRED', 'Physical EVC requires a location.');
           if (b.mode === 'PHYSICAL' && (b.offlineJustification ?? '').length < 10)
-            throw new HttpError(400, 'OFFLINE_JUSTIFICATION_REQUIRED', 'EVCs are conducted online; an offline visit needs the extraordinary circumstance recorded (e.g. Court direction) — APH Ch. I §1.8 NOTE.');
+            throw new HttpError(400, 'OFFLINE_JUSTIFICATION_REQUIRED', 'EVCs are conducted online; an offline visit needs the extraordinary circumstance recorded (e.g. Court direction).');
           await db.tx(async (t) => {
             const existing = await t.one<{ id: string; scheduled_start: string; scheduled_end: string | null; invitations_sent_at: string | null }>(
               "SELECT id, scheduled_start, scheduled_end, invitations_sent_at FROM evc_visits WHERE application_id = $1 AND status = 'PROPOSED' ORDER BY scheduled_at DESC LIMIT 1 FOR UPDATE",
@@ -1179,8 +1179,8 @@ export function officialRouter(db: Db, storage: Storage) {
             await transition(t, req, actor, app, 'SUBMIT_EVC_REPORT', {}, 'EVC report submitted (visit completion does not grant approval)');
             result.evcStageValidation = await runValidation(t, app, { stage: 'EVC', actor: `user:${u.id}`, documentStage: 'EVC' });
             await notifyRole(t, 'REGIONAL_OFFICER', app.id, 'EVC_REPORT', `EVC report ${app.reference_no}`, `Report v${version} submitted (receipt ${receipt}); forward for the next stage.`);
-            // APH Ch. I §1.10(a): the Executive Committee decides after the committee's recommendations and the Regulation Bureau's views.
-            await notifyRole(t, 'REGULATION_BUREAU', app.id, 'EVC_REPORT', `EVC final report ${app.reference_no}`, `Final EVC report v${version} (receipt ${receipt}) is available for the Regulation Bureau's views before placement before the Executive Committee (APH Ch. I §1.10(a)).`, `report:${rep!.id}:bureau`);
+            // The Executive Committee decides after the committee's recommendations and the Regulation Bureau's views.
+            await notifyRole(t, 'REGULATION_BUREAU', app.id, 'EVC_REPORT', `EVC final report ${app.reference_no}`, `Final EVC report v${version} (receipt ${receipt}) is available for the Regulation Bureau's views before placement before the Executive Committee.`, `report:${rep!.id}:bureau`);
             await notify(t, { recipientUserId: u.id, applicationId: app.id, eventType: 'EVC_REPORT_RECEIPT', title: `Report received: ${receipt}`, message: `EVC report v${version} for ${app.reference_no} was recorded at ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })} IST.`, dedupeKey: `report:${rep!.id}:receipt` });
             result.report = rep;
           });
@@ -1265,7 +1265,7 @@ export function officialRouter(db: Db, storage: Storage) {
           if (appeal?.status !== 'REFERRED') throw new HttpError(409, 'NOT_REFERRED', 'Only an appeal the SAC referred for a further Scrutiny / EVC returns to the SAC.');
           await db.tx(async (t) => {
             await t.query("UPDATE appeals SET status = 'UNDER_REVIEW', updated_at = now() WHERE application_id = $1", [app.id]);
-            await transition(t, req, actor, app, 'RETURN_TO_SAC', {}, 'Reports of the further committee placed before the SAC (Ch. I §1.11(d))');
+            await transition(t, req, actor, app, 'RETURN_TO_SAC', {}, 'Reports of the further committee placed before the SAC');
             await notifyInstitution(t, app, 'APPEAL_UPDATE', `Appeal update on ${app.reference_no}`, 'The reports of the further committee are placed before the Standing Appellate Committee. Watch for the hearing schedule.');
           });
           break;
@@ -1282,7 +1282,7 @@ export function officialRouter(db: Db, storage: Storage) {
           if (app.reopen_count >= 1) throw new HttpError(409, 'REOPEN_USED', 'Already reopened once.');
           await db.tx(async (t) => {
             await t.query('UPDATE applications SET reopen_count = reopen_count + 1, reopen_requested_at = NULL WHERE id = $1', [app.id]);
-            await transition(t, req, actor, app, 'APPROVE_REOPEN', {}, `Reopened ONE time with competent authority approval (Ch. II §2.3.3(e)). ${reason}`);
+            await transition(t, req, actor, app, 'APPROVE_REOPEN', {}, `Reopened ONE time with competent authority approval. ${reason}`);
           });
           break;
         case 'DECLINE_REOPEN':

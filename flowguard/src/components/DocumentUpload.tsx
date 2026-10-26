@@ -44,6 +44,7 @@ export function DocumentUploadModal({
     if (file.size > 10 * 1024 * 1024) return setError('The file exceeds 10 MB.');
     if (needIssue && !meta.issueDate) return setError('The issue date is needed to check the validity period.');
     if (needFy && !meta.financialYear) return setError('State the financial year covered.');
+    if (!dsc) return setError('You must declare the file is digitally signed (DSC) before uploading.');
     const fd = new FormData();
     fd.append('requirementId', doc!.id);
     if (deficiencyId) fd.append('deficiencyId', deficiencyId);
@@ -105,15 +106,17 @@ export function DocumentUploadModal({
             ))}
         </div>
         <label className="flex items-start gap-2 text-sm text-slate-700">
-          <input type="checkbox" className="mt-1" checked={dsc} onChange={(e) => setDsc(e.target.checked)} />
-          <span>I declare this file is digitally signed with a valid DSC (APH Ch. I §1.4.6). The portal records this declaration; the signature is verified by an authorised reviewer.</span>
+          <input type="checkbox" required className="mt-1" checked={dsc} onChange={(e) => setDsc(e.target.checked)} />
+          <span>
+            <span className="text-rose-600">*</span> I declare this file is digitally signed with a valid DSC. The portal records this declaration; the signature is verified by an authorised reviewer.
+          </span>
         </label>
         {error && <Alert kind="error">{error}</Alert>}
         <div className="flex justify-end gap-2 pt-1">
           <Button type="button" variant="secondary" onClick={onClose}>
             Cancel
           </Button>
-          <Button type="submit" loading={busy}>
+          <Button type="submit" disabled={!dsc} loading={busy}>
             Upload
           </Button>
         </div>

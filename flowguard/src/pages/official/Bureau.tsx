@@ -62,7 +62,7 @@ export function BureauOverview() {
             <Kpi label="Open escalations" value={open.length} tone={open.length ? 'red' : 'default'} caption="Awaiting Bureau follow-up" />
             <Kpi label="Overdue deadlines" value={overdueTotal} tone={overdueTotal ? 'amber' : 'default'} caption="Corrections, compliance and EVC follow-up" />
             <Kpi label="EVC reports missing" value={d.missingReports.length} tone={d.missingReports.length ? 'red' : 'default'} caption="Past the configured due time" />
-            <Kpi label="Compliance delays" value={d.complianceDelays.length} tone={d.complianceDelays.length ? 'amber' : 'default'} caption="Past an APH-derived due date" />
+            <Kpi label="Compliance delays" value={d.complianceDelays.length} tone={d.complianceDelays.length ? 'amber' : 'default'} caption="Past the due date" />
           </KpiRow>
           <div className="mb-6"><Alert kind="info">{d.note}</Alert></div>
           <Card className="mb-6">
@@ -111,7 +111,7 @@ export function BureauOverview() {
             </Card>
           </div>
           <Card className="mt-6">
-            <CardHeader title="Compliance delays" subtitle="Open or deficient items past an APH-derived due date" />
+            <CardHeader title="Compliance delays" subtitle="Open or deficient items past the due date" />
             <Table head={['Item', 'Application', 'Institution', 'Region', 'Due', 'Status']} empty={d.complianceDelays.length === 0 && <Empty title="No compliance delays" />}>
               {d.complianceDelays.map((o: any) => (
                 <tr key={o.id}>

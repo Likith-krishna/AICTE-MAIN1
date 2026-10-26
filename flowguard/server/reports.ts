@@ -228,7 +228,7 @@ export async function createReScrutinyReport(db: Db, app: AppRow, correctionId: 
     disclaimer: DISCLAIMER,
     generatedAt: new Date().toISOString(),
     ...(await header(db, app, cat)),
-    scopeNote: 'Re-scrutiny verifies only the deficiencies pointed out by the Scrutiny Committee (Ch. I §1.8(g)). Only rules affected by the corrected fields/documents, and rules that depend on them, were re-evaluated.',
+    scopeNote: 'Re-scrutiny verifies only the deficiencies pointed out by the Scrutiny Committee. Only rules affected by the corrected fields/documents, and rules that depend on them, were re-evaluated.',
     correctionSubmission: { id: correctionId, version: cs!.version, submittedAt: cs!.submitted_at, changedFields: cs!.changed_fields, changedDocs: cs!.changed_docs },
     run: { id: runId, evaluationDate: run!.evaluation_date, rulesEvaluated: run!.rules_evaluated, inputHash: run!.input_hash, scope: run!.scope },
     deficiencies: entries,

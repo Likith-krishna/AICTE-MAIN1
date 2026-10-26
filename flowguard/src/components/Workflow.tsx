@@ -3,13 +3,13 @@ import { useEffect, useState } from 'react';
 import { api } from '../lib/api';
 import { daysUntil, fmtDate, fmtDateTime } from '../lib/hooks';
 import { DocumentUploadModal } from './DocumentUpload';
-import { Alert, Badge, Button, cx, inputCls, Label, type Tone } from './ui';
+import { Alert, Badge, Button, cx, inputCls, Label, Modal, type Tone } from './ui';
 
 export const DEF_TONE: Record<string, Tone> = { OPEN: 'red', RESPONDED: 'blue', RESOLVED: 'green', UNRESOLVED: 'amber', PARTIALLY_RESOLVED: 'amber', DRAFT: 'slate', WITHDRAWN: 'slate' };
 
 export function deadlineText(d: { deadline_type?: string; deadline?: string | null; deadline_basis?: string | null }) {
   if (!d.deadline || d.deadline_type === 'NOT_CONFIGURED') return 'No deadline established — requires authorised configuration';
-  return d.deadline_type === 'APH' ? `APH-prescribed: ${fmtDate(d.deadline)}` : `Operational (system-configured, not APH): ${fmtDate(d.deadline)}`;
+  return d.deadline_type === 'APH' ? `Regulatory deadline: ${fmtDate(d.deadline)}` : `Operational (system-configured): ${fmtDate(d.deadline)}`;
 }
 
 /** One deficiency with its explanation, history and (for applicants) the correction controls. */
@@ -128,6 +128,24 @@ export function AppealPanel({ appId, eligibility, appeal, onFiled }: { appId: st
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [now, setNow] = useState(Date.now());
+  const [confirmAppeal, setConfirmAppeal] = useState(false);
+  const [declared, setDeclared] = useState(false);
+  async function fileAppeal() {
+    setBusy(true);
+    setErr(null);
+    const fd = new FormData();
+    fd.append('grounds', grounds);
+    if (file) fd.append('file', file);
+    try {
+      await api.upload(`/api/applications/${appId}/appeal`, fd);
+      onFiled();
+    } catch (e: any) {
+      setConfirmAppeal(false);
+      setErr(e.message);
+    } finally {
+      setBusy(false);
+    }
+  }
   useEffect(() => {
     const t = setInterval(() => setNow(Date.now()), 60_000);
     return () => clearInterval(t);
@@ -175,30 +193,33 @@ export function AppealPanel({ appId, eligibility, appeal, onFiled }: { appId: st
             <input id="appealfile" type="file" accept=".pdf,.jpg,.jpeg,.png" className={inputCls} onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
           </div>
           {err && <Alert kind="error">{err}</Alert>}
-          <Button
-            loading={busy}
-            disabled={grounds.trim().length < 20}
-            onClick={async () => {
-              if (!confirm('File the appeal? The APH allows one appeal only.')) return;
-              setBusy(true);
-              setErr(null);
-              const fd = new FormData();
-              fd.append('grounds', grounds);
-              if (file) fd.append('file', file);
-              try {
-                await api.upload(`/api/applications/${appId}/appeal`, fd);
-                onFiled();
-              } catch (e: any) {
-                setErr(e.message);
-              } finally {
-                setBusy(false);
-              }
-            }}
-          >
+          <Button disabled={grounds.trim().length < 20} onClick={() => setConfirmAppeal(true)}>
             File appeal
           </Button>
         </div>
       )}
+      <Modal
+        open={confirmAppeal}
+        onClose={() => {
+          setConfirmAppeal(false);
+          setDeclared(false);
+        }}
+        title="File the appeal"
+      >
+        <div className="space-y-4 text-sm">
+          <Alert kind="warn">Only one appeal is allowed. This cannot be withdrawn or refiled once submitted.</Alert>
+          <label className="flex items-start gap-2">
+            <input type="checkbox" required className="mt-1" checked={declared} onChange={(e) => setDeclared(e.target.checked)} />
+            <span>
+              <span className="text-rose-600">*</span> I am authorised to file this appeal on behalf of the institution and declare that the grounds stated are true and correct.
+            </span>
+          </label>
+          <div className="flex justify-end gap-2">
+            <Button variant="secondary" onClick={() => { setConfirmAppeal(false); setDeclared(false); }}>Cancel</Button>
+            <Button onClick={fileAppeal} disabled={!declared} loading={busy}>File appeal</Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

@@ -282,7 +282,7 @@ export default function ApplicationWizard() {
         <Card className="p-8 text-center">
           <CheckCircle2 className="mx-auto h-12 w-12 text-emerald-600" />
           <h1 className="mt-4 text-2xl font-semibold">Application submitted</h1>
-          <p className="mt-2 text-sm text-slate-500">The application is now locked for editing while it is processed (APH Ch. II §2.3.3(c)).</p>
+          <p className="mt-2 text-sm text-slate-500">The application is now locked for editing while it is processed.</p>
           <div className="mx-auto mt-6 grid max-w-md gap-3 rounded-xl bg-slate-50 p-4 text-left text-sm sm:grid-cols-2">
             <div>
               <div className="text-xs text-slate-500">Tracking reference</div>
@@ -318,7 +318,7 @@ export default function ApplicationWizard() {
             Applications <span className="mx-1.5 text-slate-300">/</span> <span className="text-slate-700">{app?.reference_no ?? (app ? 'Draft' : 'New application')}</span>
           </div>
           <h1 className="text-[26px] leading-tight font-bold tracking-tight text-slate-900">Application requirements</h1>
-          <p className="mt-1 max-w-3xl text-sm text-slate-500">Choose an application type to load its APH-referenced fields, document checklist, validity rules and review controls.</p>
+          <p className="mt-1 max-w-3xl text-sm text-slate-500">Choose an application type to load its fields, document checklist, validity rules and review controls.</p>
         </div>
         {app && (
           <Button variant="secondary" onClick={() => save()} loading={busy === 'save'}>
@@ -523,7 +523,7 @@ export default function ApplicationWizard() {
                   'Mandatory fields and files enforced server-side',
                   'Application locked after final submission',
                   'Reopening (once) requires authority approval',
-                  'Only explicit APH validity periods are enforced',
+                  'Only explicit, verified validity periods are enforced',
                   'File SHA-256 and version history retained',
                   'Human-review items are never auto-approved',
                 ].map((t) => (
@@ -556,7 +556,7 @@ export default function ApplicationWizard() {
             <div><div className="text-xs text-slate-500">Documents uploaded</div><div className="font-semibold">{checklist.filter((d) => d.uploaded).length}</div></div>
             <div><div className="text-xs text-slate-500">Subtype</div><div className="font-semibold">{cat?.subtypes?.find((s) => s.value === subtype)?.label ?? '—'}</div></div>
           </div>
-          <Alert kind="warn">After final submission the data cannot be edited while processing is ongoing. Reopening is possible only once, with competent authority approval (Ch. II §2.3.3).</Alert>
+          <Alert kind="warn">After final submission the data cannot be edited while processing is ongoing. Reopening is possible only once, with competent authority approval.</Alert>
           <label className="flex items-start gap-2">
             <input type="checkbox" className="mt-1" checked={declared} onChange={(e) => setDeclared(e.target.checked)} />
             <span>I am authorised to submit on behalf of the institution and declare that the information and documents are true and correct.</span>

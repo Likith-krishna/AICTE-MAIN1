@@ -120,7 +120,7 @@ export function EvcVisits() {
               {!['CANCELLED'].includes(v.status) && (
                 <div className="mt-4 rounded-lg border border-slate-200 p-3">
                   <div className="text-[13px] font-semibold text-slate-900">Video link of the facilities / visit proceedings</div>
-                  <p className="mt-0.5 text-xs text-slate-500">APH Ch. I §1.9(f)-(g): upload the video (not less than 30 minutes) on the Trust / Society website and share the link here.</p>
+                  <p className="mt-0.5 text-xs text-slate-500">Upload the video (not less than 30 minutes) on the Trust / Society website and share the link here.</p>
                   {v.institution_video_link && <p className="mt-1 text-xs break-all text-emerald-700">Shared: {v.institution_video_link}</p>}
                   <div className="mt-2 flex gap-2">
                     <input aria-label="Video link" className={inputCls} placeholder="https://" value={links[v.id] ?? ''} onChange={(e) => setLinks({ ...links, [v.id]: e.target.value })} />
@@ -261,7 +261,7 @@ export function Compliance() {
       {data && (
         <>
           <KpiRow>
-            <Kpi label="Overdue" value={cnt(['OVERDUE'])} tone={cnt(['OVERDUE']) ? 'red' : 'default'} caption="Past an APH-derived due date" />
+            <Kpi label="Overdue" value={cnt(['OVERDUE'])} tone={cnt(['OVERDUE']) ? 'red' : 'default'} caption="Past the due date" />
             <Kpi label="Due soon" value={cnt(['DUE_SOON'])} tone="amber" caption={`Within ${data.dueSoonDays} days`} />
             <Kpi label="Awaiting review" value={cnt(['SUBMITTED', 'UNDER_REVIEW', 'HUMAN_REVIEW_REQUIRED'])} tone="blue" caption="Submitted evidence" />
             <Kpi label="Document alerts" value={docs.filter((d) => ['EXPIRED', 'EXPIRING_SOON'].includes(d.status)).length} tone={docs.some((d) => d.status === 'EXPIRED') ? 'red' : 'default'} caption={`Expired or expiring within ${validity.data?.alertDays ?? '—'} days`} />
@@ -271,7 +271,7 @@ export function Compliance() {
               <Tabs value={tab} onChange={setTab} items={[{ value: 'obligations', label: `Obligations & undertakings (${obls.length})` }, { value: 'validity', label: `Document validity (${docs.length})` }]} />
             </div>
             {tab === 'obligations' && (
-              <Table head={['Item', 'Application', 'Due date', 'Status', '']} empty={obls.length === 0 && <Empty icon={<ClipboardCheck className="h-5 w-5" />} title="No compliance obligations">Obligations appear when an APH provision creates one (e.g. Security Deposit within 15 days, enrolment upload before 30 November).</Empty>}>
+              <Table head={['Item', 'Application', 'Due date', 'Status', '']} empty={obls.length === 0 && <Empty icon={<ClipboardCheck className="h-5 w-5" />} title="No compliance obligations">Obligations appear when a regulatory provision creates one (e.g. Security Deposit within 15 days, enrolment upload before 30 November).</Empty>}>
                 {obls.map((o) => {
                   const [label, t] = STATE[o.displayStatus] ?? [o.displayStatus, 'slate'];
                   const lastReview = o.reviews?.[0];
@@ -287,7 +287,7 @@ export function Compliance() {
                         {lastReview && <div className="mt-0.5 text-xs text-slate-600">Reviewer: {lastReview.note}</div>}
                       </td>
                       <td className={`${tdCls} font-mono text-xs`}>{o.reference_no ?? '—'}</td>
-                      <td className={`${tdCls} text-xs whitespace-nowrap`}>{o.due_date ? fmtDate(o.due_date) : 'Not stated in the APH'}</td>
+                      <td className={`${tdCls} text-xs whitespace-nowrap`}>{o.due_date ? fmtDate(o.due_date) : 'No date stated'}</td>
                       <td className={tdCls}><Badge t={t}>{label}</Badge></td>
                       <td className={tdCls}>
                         {!['ACCEPTED_BY_AUTHORISED_REVIEWER', 'UNDER_REVIEW'].includes(o.status) && (
@@ -303,7 +303,7 @@ export function Compliance() {
             )}
             {tab === 'validity' && (
               <>
-                <div className="px-5 pt-4"><Alert kind="info">Validity is calculated only where a verified APH rule establishes it. Alerts are sent {validity.data?.alertDays ?? '—'} days before a recorded expiry ({validity.data?.policy?.status === 'AUTHORISED' ? 'authorised' : 'demonstration'} operational setting).</Alert></div>
+                <div className="px-5 pt-4"><Alert kind="info">Validity is calculated only where a verified rule establishes it. Alerts are sent {validity.data?.alertDays ?? '—'} days before a recorded expiry ({validity.data?.policy?.status === 'AUTHORISED' ? 'authorised' : 'demonstration'} operational setting).</Alert></div>
                 <Table className="mt-4" head={['Document', 'Application', 'Expires on', 'Days left', 'Status', 'Basis']} empty={docs.length === 0 && <Empty title="No documents uploaded" />}>
                   {docs.map((d) => {
                     const [label, t] = VALIDITY[d.status] ?? [d.status, 'slate'];

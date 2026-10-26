@@ -19,7 +19,7 @@ export default function Help() {
           <BookOpen className="h-5 w-5 text-brand-600" />
           <h3 className="mt-2 font-semibold">Regulatory sources</h3>
           <p className="mt-1 text-sm text-slate-600">
-            Requirements are taken only from the AICTE Approval Process Handbook 2024-25 to 2026-27 and the APH Document Requirements Matrix supplied with this project. No other source and no AI model is used to decide requirements at runtime.
+            Requirements are taken only from verified regulatory sources supplied with this project. No other source and no AI model is used to decide requirements at runtime.
           </p>
         </Card>
         <Card className="p-5">

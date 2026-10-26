@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { DocumentUploadModal } from '../components/DocumentUpload';
 import { FieldInput } from '../components/FieldInput';
-import { Alert, Badge, Button, Card, CardHeader, cx, Empty, inputCls, Label, PageHeader, PageNote, Spinner } from '../components/ui';
+import { Alert, Badge, Button, Card, CardHeader, cx, Empty, inputCls, Label, Modal, PageHeader, PageNote, Spinner } from '../components/ui';
 import { deadlineText } from '../components/Workflow';
 import { api } from '../lib/api';
 import { daysUntil, fmtDate, fmtDateTime, useApi } from '../lib/hooks';
@@ -23,6 +23,8 @@ export default function RespondNotice() {
   const [upload, setUpload] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [msg, setMsg] = useState<{ kind: 'success' | 'error'; text: string; retry?: () => void } | null>(null);
+  const [confirmSubmit, setConfirmSubmit] = useState(false);
+  const [declared, setDeclared] = useState(false);
 
   useEffect(() => {
     if (data?.application?.category_code) api.get(`/api/categories/${data.application.category_code}`).then((r) => setCat(r.category));
@@ -70,13 +72,13 @@ export default function RespondNotice() {
     }
   }
   async function submitPackage() {
-    if (!confirm('Submit the correction package for re-scrutiny? Responses cannot be edited afterwards.')) return;
     setBusy('submit');
     setMsg(null);
     try {
       await api.post(`/api/applications/${a.id}/corrections/submit`);
       nav(`/applications/${a.id}`);
     } catch (e: any) {
+      setConfirmSubmit(false);
       setMsg({ kind: 'error', text: e.message, retry: submitPackage });
     } finally {
       setBusy(null);
@@ -283,7 +285,7 @@ export default function RespondNotice() {
                     {pending ? `${pending} item${pending === 1 ? '' : 's'} still need a response before the package can be submitted.` : 'All items have a response. Submitting sends the package to the Re-Scrutiny Committee.'}
                   </div>
                 </div>
-                <Button disabled={pending > 0} loading={busy === 'submit'} onClick={submitPackage}>
+                <Button disabled={pending > 0} onClick={() => setConfirmSubmit(true)}>
                   Submit correction package
                 </Button>
               </div>
@@ -310,6 +312,32 @@ export default function RespondNotice() {
           }}
         />
       )}
+      <Modal
+        open={confirmSubmit}
+        onClose={() => {
+          setConfirmSubmit(false);
+          setDeclared(false);
+        }}
+        title="Submit correction package"
+      >
+        <div className="space-y-4 text-sm">
+          <div className="grid grid-cols-2 gap-3 rounded-lg bg-slate-50 p-3">
+            <div><div className="text-xs text-slate-500">Application</div><div className="font-semibold">{a.reference_no}</div></div>
+            <div><div className="text-xs text-slate-500">Items responded</div><div className="font-semibold">{answered} of {items.length}</div></div>
+          </div>
+          <Alert kind="warn">Responses cannot be edited after submission. The package is sent to the Re-Scrutiny Committee, which examines only the items in this notice.</Alert>
+          <label className="flex items-start gap-2">
+            <input type="checkbox" required className="mt-1" checked={declared} onChange={(e) => setDeclared(e.target.checked)} />
+            <span>
+              <span className="text-rose-600">*</span> I am authorised to respond on behalf of the institution and declare that the corrections and documents submitted are true and correct.
+            </span>
+          </label>
+          <div className="flex justify-end gap-2">
+            <Button variant="secondary" onClick={() => { setConfirmSubmit(false); setDeclared(false); }}>Cancel</Button>
+            <Button onClick={submitPackage} disabled={!declared} loading={busy === 'submit'}>Submit correction package</Button>
+          </div>
+        </div>
+      </Modal>
     </>
   );
 }

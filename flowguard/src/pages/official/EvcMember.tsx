@@ -118,7 +118,7 @@ export function VisitWorkspace() {
           <KV k={v.mode === 'ONLINE' ? 'Meeting link' : 'Location'} v={<span className="break-all">{(v.mode === 'ONLINE' ? v.meeting_link : v.location) || 'Shared by the Regional Officer'}</span>} />
           <KV k="Institution video link" v={v.institution_video_link ? <a className="break-all text-brand-600 underline" href={v.institution_video_link} target="_blank" rel="noreferrer noopener">Open</a> : 'Not shared yet'} />
         </div>
-        {v.offline_justification && <div className="border-t border-slate-100 px-5 py-3 text-[13px] text-slate-600">Offline visit justification (Ch. I §1.8 NOTE): {v.offline_justification}</div>}
+        {v.offline_justification && <div className="border-t border-slate-100 px-5 py-3 text-[13px] text-slate-600">Offline visit justification: {v.offline_justification}</div>}
         {isMember && (v.instructions || beforeVisit) && (
           <div className="border-t border-slate-100 px-5 py-3 text-[13px] text-slate-600">
             {v.instructions && <div className="mb-1">Note from the Regional Officer: “{v.instructions}”</div>}
@@ -315,7 +315,7 @@ export function VisitWorkspace() {
             <Card>
               <CardHeader
                 title="Final EVC report"
-                subtitle="Sections follow what APH Ch. I §1.9(c)-(g) asks the EVC to verify. On submission the report goes to the Regional Officer and the Regulation Bureau; the Executive Committee decides after the committee's recommendation and the Bureau's views (APH Ch. I §1.10(a))."
+                subtitle="On submission the report goes to the Regional Officer and the Regulation Bureau; the Executive Committee decides after the committee's recommendation and the Bureau's views."
                 divided
               />
               <div className="space-y-4 p-5">
@@ -324,7 +324,6 @@ export function VisitWorkspace() {
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <div>
                         <div className="text-sm font-medium text-slate-900">{s.label}</div>
-                        <div className="text-[11px] text-slate-400">{s.reference}</div>
                       </div>
                       <select aria-label={`${s.label} finding`} className="rounded-md border border-slate-300 px-2 py-1.5 text-xs" value={sections[s.key]?.finding ?? ''} onChange={(e) => setSections({ ...sections, [s.key]: { ...sections[s.key], finding: e.target.value || undefined } })}>
                         <option value="">Not recorded</option>
@@ -406,7 +405,7 @@ export function VisitWorkspace() {
 
           {data.reports.length > 0 && (
             <Card>
-              <CardHeader title="Final report submitted" subtitle="Sent to the Regional Officer and the Regulation Bureau, for the Executive Committee (APH Ch. I §1.10(a))" divided />
+              <CardHeader title="Final report submitted" subtitle="Sent to the Regional Officer and the Regulation Bureau, for the Executive Committee" divided />
               <div className="space-y-4 p-5">
                 {data.reports.map((r: any) => (
                   <div key={r.id} className="rounded-lg border border-emerald-200 bg-emerald-50/40 p-4 text-sm">
@@ -487,7 +486,7 @@ export function VisitWorkspace() {
             </ul>
           </Card>
           <Card>
-            <CardHeader title="Deadlines" subtitle="Operational follow-up, not APH deadlines" divided />
+            <CardHeader title="Deadlines" subtitle="Operational follow-up" divided />
             <ul className="space-y-2 p-5 text-xs">
               {data.deadlines.length === 0 && <li className="text-slate-500">None.</li>}
               {data.deadlines.map((d: any) => (

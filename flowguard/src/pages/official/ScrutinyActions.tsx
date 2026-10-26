@@ -210,7 +210,7 @@ export function ScrutinyActions({
                       </select>
                     </div>
                   </div>
-                  <p className="font-mono text-[10px] text-slate-400">{i.sourceReference || 'No APH source cited'}{i.sourceFindingRuleId && ` · ${i.sourceFindingRuleId}`}</p>
+                  <p className="font-mono text-[10px] text-slate-400">{i.sourceReference || 'No source cited'}{i.sourceFindingRuleId && ` · ${i.sourceFindingRuleId}`}</p>
                 </div>
               )}
             </div>
@@ -231,8 +231,8 @@ export function ScrutinyActions({
               <Label>Correction deadline</Label>
               <select className={inputCls} value={deadline.type} onChange={(e) => setDeadline({ ...deadline, type: e.target.value })}>
                 <option value="NOT_CONFIGURED">None — requires authorised configuration</option>
-                <option value="OPERATIONAL">Operational (system-configured, not APH)</option>
-                <option value="APH">APH-prescribed (cite clause)</option>
+                <option value="OPERATIONAL">Operational (system-configured)</option>
+                <option value="APH">Regulatory (cite clause)</option>
               </select>
             </div>
             {deadline.type !== 'NOT_CONFIGURED' && (

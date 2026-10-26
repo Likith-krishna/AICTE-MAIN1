@@ -81,7 +81,6 @@ export function SupervisorOverview() {
                     <div className="text-xs text-slate-500">Active rule set</div>
                     <div className="font-mono text-sm font-semibold text-slate-900">{sv.rulesetVersion}</div>
                   </div>
-                  <Badge t="green">APH 2024–27</Badge>
                 </div>
                 <dl className="mt-4 grid grid-cols-2 gap-3 text-sm">
                   {[
@@ -284,7 +283,7 @@ export function Escalations() {
       />
       {data?.policy && (
         <div className="mb-6">
-          <Alert kind="info" title="Operational policy (system-configured, not APH)">
+          <Alert kind="info" title="Operational policy (system-configured)">
             <ul className="list-disc pl-4">{data.policy.map((p: string) => <li key={p}>{p}</li>)}</ul>
           </Alert>
         </div>
@@ -303,7 +302,7 @@ export function Escalations() {
                   <td className={tdCls}><Link className="font-mono text-[13px] font-semibold text-brand-600" to={`/official/applications/${d.application_id}`}>{d.application_ref}</Link></td>
                   <td className={`${tdCls} text-sm`}>{d.institution_name}</td>
                   <td className={`${tdCls} text-[13px]`}>{fmtDate(d.deadline)}</td>
-                  <td className={tdCls}><Badge t={d.deadline_type === 'APH' ? 'red' : 'amber'}>{d.deadline_type.toLowerCase()}</Badge></td>
+                  <td className={tdCls}><Badge t={d.deadline_type === 'APH' ? 'red' : 'amber'}>{d.deadline_type === 'APH' ? 'regulatory' : 'operational'}</Badge></td>
                   <td className={`${tdCls} text-[13px]`}>{d.raised_by_name}</td>
                 </tr>
               ))}
@@ -372,6 +371,7 @@ export function AdminConsole() {
   const n = useApi(`/api/official/admin/notifications${status === 'ALL' ? '' : `?status=${status}`}`);
   const jobs = useApi('/api/official/admin/jobs');
   const [msg, setMsg] = useState<string | null>(null);
+  const [busy, setBusy] = useState<string | null>(null);
   const count = (s: string) => (n.data?.counts ?? []).find((c: any) => c.delivery_status === s)?.n ?? 0;
   return (
     <>
@@ -381,8 +381,40 @@ export function AdminConsole() {
         subtitle="In-app delivery tracking (no email/SMS channel is configured) and deadline-monitor runs."
         action={
           <>
-            <Button variant="secondary" onClick={async () => { const r = await api.post('/api/official/admin/notifications/retry'); setMsg(`Retried ${r.retried}; delivered ${r.delivered}.`); n.reload(); }}>Retry failed deliveries</Button>
-            <Button onClick={async () => { const r = await api.post('/api/official/admin/run-sweep'); setMsg(`Sweep: ${r.reminders} reminders, ${r.overdue} overdue, ${r.escalations} escalations.`); jobs.reload(); n.reload(); }}>Run deadline monitor</Button>
+            <Button
+              variant="secondary"
+              loading={busy === 'retry'}
+              disabled={!!busy}
+              onClick={async () => {
+                setBusy('retry');
+                try {
+                  const r = await api.post('/api/official/admin/notifications/retry');
+                  setMsg(`Retried ${r.retried}; delivered ${r.delivered}.`);
+                  n.reload();
+                } finally {
+                  setBusy(null);
+                }
+              }}
+            >
+              Retry failed deliveries
+            </Button>
+            <Button
+              loading={busy === 'sweep'}
+              disabled={!!busy}
+              onClick={async () => {
+                setBusy('sweep');
+                try {
+                  const r = await api.post('/api/official/admin/run-sweep');
+                  setMsg(`Sweep: ${r.reminders} reminders, ${r.overdue} overdue, ${r.escalations} escalations.`);
+                  jobs.reload();
+                  n.reload();
+                } finally {
+                  setBusy(null);
+                }
+              }}
+            >
+              Run deadline monitor
+            </Button>
           </>
         }
       />

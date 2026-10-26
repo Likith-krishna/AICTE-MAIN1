@@ -42,9 +42,9 @@ export const POLICY_DESCRIPTION = [
 export const OPERATIONAL_DEFAULTS: Record<string, { value: number; description: string }> = {
   EVC_ACK_FOLLOWUP_HOURS: { value: 48, description: 'Hours after an EVC invitation within which the member is asked to accept or decline; unanswered invitations are then flagged to the Regional Officer and the Regulation Bureau.' },
   EVC_VISIT_OUTCOME_GRACE_HOURS: { value: 24, description: 'Hours after the scheduled visit start after which a visit with no recorded outcome (completed / missed) is flagged for follow-up. The visit is never marked completed or missed automatically.' },
-  EVC_REPORT_DUE_DAYS: { value: 3, description: 'Days after the visit is recorded as completed within which the EVC report is expected. The APH does not state a report period.' },
+  EVC_REPORT_DUE_DAYS: { value: 3, description: 'Days after the visit is recorded as completed within which the EVC report is expected.' },
   DOCUMENT_EXPIRY_ALERT_DAYS: { value: 30, description: 'Days before a recorded document expiry date at which the institution is alerted (only for documents whose validity is established by a verified rule).' },
-  COMPLIANCE_DUE_SOON_DAYS: { value: 14, description: 'Window in which a compliance item with an APH-derived due date is shown as "due soon".' },
+  COMPLIANCE_DUE_SOON_DAYS: { value: 14, description: 'Window in which a compliance item with a recorded due date is shown as "due soon".' },
   EVC_SCHEDULING_BUFFER_MINUTES: { value: 0, description: 'Minutes kept free before and after each visit for an official (travel / changeover). 0 means consecutive visits are allowed: [10:00, 12:00) does not overlap [12:00, 13:00).' },
   EVC_SLOT_WINDOW_START_HOUR: { value: 9, description: 'Earliest start hour (IST) used when suggesting alternative visit slots. Suggestions only; officers may choose any time.' },
   EVC_SLOT_WINDOW_END_HOUR: { value: 18, description: 'Latest end hour (IST) used when suggesting alternative visit slots.' },

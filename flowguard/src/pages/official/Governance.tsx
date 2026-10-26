@@ -28,7 +28,7 @@ export function RulesGovernance() {
   const count = (s: string) => (data?.counts ?? []).find((c: any) => c.lifecycle_status === s)?.n ?? 0;
   return (
     <>
-      <PageHeader crumbs={['Workspace', 'Regulatory rules']} title="Regulatory rules" subtitle="Versioned rules derived from the APH, and their approval status." />
+      <PageHeader crumbs={['Workspace', 'Regulatory rules']} title="Regulatory rules" subtitle="Versioned rules and their approval status." />
       <div className="mb-6">
         <Alert kind="warn" title="Development seed approval">
           Rules extracted from verified sources were seeded as approved for execution in this development build. In a real deployment an authorised rules-governance official must review and approve each rule.
@@ -55,7 +55,7 @@ export function RulesGovernance() {
         </div>
         {loading && !data && <Spinner />}
         {error && <div className="p-4"><Alert kind="error">{error}</Alert></div>}
-        <Table head={['Rule', 'Severity', 'Source', 'Lifecycle', 'Approved', ...(canEdit ? [''] : [])]} empty={data?.rules.length === 0 && <Empty title="No rules match" />}>
+        <Table head={['Rule', 'Severity', 'Lifecycle', 'Approved', ...(canEdit ? [''] : [])]} empty={data?.rules.length === 0 && <Empty title="No rules match" />}>
           {paged.slice.map((r: any) => (
             <tr key={`${r.rule_id}@${r.rule_version}`} className="align-top">
               <td className={tdCls}>
@@ -64,7 +64,6 @@ export function RulesGovernance() {
                 <div className="text-[11px] text-slate-400">{r.rule_type.replace(/_/g, ' ').toLowerCase()}</div>
               </td>
               <td className={tdCls}><Badge t={r.severity === 'BLOCKING' ? 'red' : 'amber'}>{r.severity === 'BLOCKING' ? 'Blocking' : 'Advisory'}</Badge></td>
-              <td className={tdCls}><div className="line-clamp-2 max-w-[300px] text-xs text-slate-600" title={r.source_evidence}>{r.aph_reference ?? r.source_evidence}</div></td>
               <td className={tdCls}><Badge t={r.lifecycle_status === 'APPROVED_FOR_EXECUTION' ? 'green' : r.lifecycle_status === 'RETIRED' ? 'slate' : 'amber'}>{LIFECYCLE_LABEL[r.lifecycle_status] ?? r.lifecycle_status}</Badge></td>
               <td className={`${tdCls} text-xs text-slate-500`}><div className="max-w-[160px] truncate">{r.approved_by ? `${r.approved_by}` : '—'}</div>{r.approved_at && <div>{fmtDate(r.approved_at)}</div>}</td>
               {canEdit && (
@@ -136,7 +135,7 @@ export function ComplianceReview() {
         <>
           <KpiRow>
             <Kpi label="Awaiting review" value={all.filter((o) => ['SUBMITTED', 'UNDER_REVIEW'].includes(o.status)).length} tone="blue" caption="Submitted evidence" />
-            <Kpi label="Overdue" value={all.filter((o) => o.displayStatus === 'OVERDUE').length} tone="red" caption="Past an APH-derived due date" />
+            <Kpi label="Overdue" value={all.filter((o) => o.displayStatus === 'OVERDUE').length} tone="red" caption="Past the due date" />
             <Kpi label="Deficient" value={all.filter((o) => o.status === 'DEFICIENT').length} tone="amber" caption="Returned to the institution" />
             <Kpi label="Accepted" value={all.filter((o) => o.status === 'ACCEPTED_BY_AUTHORISED_REVIEWER').length} tone="green" caption="By an authorised reviewer" />
           </KpiRow>

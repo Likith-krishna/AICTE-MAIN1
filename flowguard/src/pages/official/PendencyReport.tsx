@@ -166,7 +166,7 @@ export function PendencyReport() {
   );
 }
 
-/** Operational configuration (not APH requirements): administrators propose, supervisors authorise. */
+/** Operational configuration: administrators propose, supervisors authorise. */
 export function OperationalPolicies() {
   const { user } = useAuth();
   const role = user?.activeRole ?? '';
@@ -186,8 +186,8 @@ export function OperationalPolicies() {
   };
   return (
     <>
-      <PageHeader crumbs={['Workspace', 'Operational settings']} title="Operational settings" subtitle="Follow-up periods used where the APH sets none (reminders only)." />
-      {data && <div className="mb-6"><Alert kind="warn" title="Not APH requirements">{data.note} Values marked “demonstration” have not been authorised.</Alert></div>}
+      <PageHeader crumbs={['Workspace', 'Operational settings']} title="Operational settings" subtitle="Follow-up periods (reminders only)." />
+      {data && <div className="mb-6"><Alert kind="warn" title="Operational setting">{data.note} Values marked “demonstration” have not been authorised.</Alert></div>}
       {msg && <div className="mb-4"><Alert kind={msg.kind}>{msg.text}</Alert></div>}
       {loading && !data && <Spinner />}
       {error && <Alert kind="error">{error}</Alert>}

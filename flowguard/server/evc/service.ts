@@ -325,7 +325,7 @@ export async function sendInvitations(t: Db, u: AuthUser, app: { id: string; ref
   const changingConfirmed = v.status !== 'PROPOSED';
   if (changingConfirmed && (!reason || reason.trim().length < 5)) throw new HttpError(400, 'REASON_REQUIRED', 'Replacing members of a confirmed visit requires a reason.');
   const comp = await checkComposition(t, members);
-  if (!comp.valid) throw new HttpError(409, 'COMPOSITION_INVALID', 'The committee does not satisfy the required composition (Annexure 16 §16.5).', comp.findings.filter((f) => f.blocking));
+  if (!comp.valid) throw new HttpError(409, 'COMPOSITION_INVALID', 'The committee does not satisfy the required composition.', comp.findings.filter((f) => f.blocking));
 
   const current = await t.query<{ user_id: string; expert_id: string | null; response_status: string; active: boolean; invited_version: number | null; full_name: string }>(
     'SELECT m.user_id, m.expert_id, m.response_status, m.active, m.invited_version, uu.full_name FROM evc_visit_members m JOIN users uu ON uu.id = m.user_id WHERE m.visit_id = $1',
@@ -444,14 +444,14 @@ export async function respond(t: Db, u: AuthUser, visitId: string, to: 'ACCEPTED
 export async function assertReadyToConfirm(t: Db, visitId: string) {
   const all = await t.query<{ response_status: string; active: boolean }>('SELECT response_status, active FROM evc_visit_members WHERE visit_id = $1', [visitId]);
   const act = all.filter((m) => m.active);
-  if (!act.length) throw new HttpError(409, 'NO_COMMITTEE', 'Invite the committee before confirming the visit (Annexure 16 §16.5).');
+  if (!act.length) throw new HttpError(409, 'NO_COMMITTEE', 'Invite the committee before confirming the visit.');
   if (act.some((m) => m.response_status === 'REJECTED')) throw new HttpError(409, 'COMMITTEE_INCOMPLETE', 'A member declined. Replace the member before confirming.');
   const pending = act.filter((m) => m.response_status !== 'ACCEPTED');
   if (pending.length) throw new HttpError(409, 'RESPONSES_PENDING', `${pending.length} committee member(s) have not accepted yet. A visit is confirmed only after every member accepts.`);
   const comm = await currentCommittee(t, visitId);
   if (comm.some((m) => !m.expert_id || !m.seat)) throw new HttpError(409, 'COMMITTEE_NOT_FROM_REGISTRY', 'Every member must be selected from the verified registry with a seat.');
   const comp = await checkComposition(t, comm.map((m) => ({ expertId: m.expert_id!, seat: m.seat! })));
-  if (!comp.valid) throw new HttpError(409, 'COMPOSITION_INVALID', 'The committee does not satisfy the required composition (Annexure 16 §16.5).', comp.findings.filter((f) => f.blocking));
+  if (!comp.valid) throw new HttpError(409, 'COMPOSITION_INVALID', 'The committee does not satisfy the required composition.', comp.findings.filter((f) => f.blocking));
   return comp;
 }
 
@@ -520,15 +520,15 @@ export function memberStatus(m: { active: boolean; response_status: string }, v:
  * the committee's finding; FlowGuard does not score or decide anything from them.
  */
 export const REPORT_SECTIONS = [
-  { key: 'INSTRUCTIONAL', label: 'Instructional area readiness', reference: 'Ch. I §1.9(c); Annexure 3 & 4' },
-  { key: 'ADMINISTRATIVE', label: 'Administrative area readiness', reference: 'Ch. I §1.9(c); Annexure 3 & 4' },
-  { key: 'AMENITIES', label: 'Amenities', reference: 'Ch. I §1.9(c); Annexure 3 & 4' },
-  { key: 'LAB_EQUIPMENT', label: 'Laboratory equipment as per curriculum and syllabus', reference: 'Ch. I §1.9(c), (e)' },
-  { key: 'DOCUMENTS', label: 'Relevant documents', reference: 'Ch. I §1.9(c); Annexure 1' },
-  { key: 'ESSENTIAL_DESIRABLE', label: 'Essential and desirable requirements (Chapter VI)', reference: 'Ch. I §1.9(c); Ch. VI' },
-  { key: 'FACULTY', label: 'Appointment of Principal / Director and faculty against norms', reference: 'Ch. I §1.9(d)' },
-  { key: 'COMPUTING_LIBRARY', label: 'Computers, software, internet, printers, books, journals and stock registers', reference: 'Ch. I §1.9(e)' },
-  { key: 'VIDEO_RECORDING', label: 'Institution video recording of the visit / facilities (link shared)', reference: 'Ch. I §1.9(f)-(g) and Note' },
+  { key: 'INSTRUCTIONAL', label: 'Instructional area readiness' },
+  { key: 'ADMINISTRATIVE', label: 'Administrative area readiness' },
+  { key: 'AMENITIES', label: 'Amenities' },
+  { key: 'LAB_EQUIPMENT', label: 'Laboratory equipment as per curriculum and syllabus' },
+  { key: 'DOCUMENTS', label: 'Relevant documents' },
+  { key: 'ESSENTIAL_DESIRABLE', label: 'Essential and desirable requirements' },
+  { key: 'FACULTY', label: 'Appointment of Principal / Director and faculty against norms' },
+  { key: 'COMPUTING_LIBRARY', label: 'Computers, software, internet, printers, books, journals and stock registers' },
+  { key: 'VIDEO_RECORDING', label: 'Institution video recording of the visit / facilities (link shared)' },
 ] as const;
 export const SECTION_FINDINGS = ['VERIFIED_AVAILABLE', 'DEFICIENT', 'NOT_VERIFIED', 'NOT_APPLICABLE'] as const;
 /** Kinds of material a member attaches to the report (labels only; FlowGuard does not score them). */

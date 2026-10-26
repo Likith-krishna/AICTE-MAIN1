@@ -66,7 +66,7 @@ export function evcRouter(db: Db, storage: Storage) {
       res.json({
         experts: rows.map(withEligibility),
         seats: SEATS.map((s) => ({ seat: s, label: SEAT_LABEL[s] })),
-        note: 'Composition per APH Annexure 16 §16.5. Member selection through this registry is a portal operational procedure; APH Ch. I §1.9(a) describes selection through AICTE\'s automated web portal.',
+        note: 'Member selection through this registry is a portal operational procedure, in line with AICTE\'s automated web portal selection process.',
       });
     }),
   );

@@ -8,35 +8,31 @@ import { useCategories } from '../../lib/categories';
 import { fmtDate, fmtDateTime, useApi } from '../../lib/hooks';
 import { actionLabel } from '../../lib/roles';
 
-/** What each body is for, with the APH clause it acts under (shown on its desk). */
-const DESK: Record<string, { title: string; icon: typeof Gavel; tone: Tone; purpose: string; reference: string }> = {
+/** What each body is for. */
+const DESK: Record<string, { title: string; icon: typeof Gavel; tone: Tone; purpose: string }> = {
   EC: {
     title: 'Executive Committee',
     icon: Gavel,
     tone: 'blue',
     purpose: 'Decides on applications after considering the committee recommendations and the views of the Regulation Bureau. Decisions are uploaded as LoA / LoD / LoR, with a speaking order where required.',
-    reference: 'APH Ch. I §1.10; Ch. II §2.23.3',
   },
   SHC: {
     title: 'Standing Hearing Committee',
     icon: Users,
     tone: 'violet',
     purpose: 'Verifies the compliance an institution submits for shortcomings found by Scrutiny / Re-Scrutiny / EVC. Its recommendations are placed before the Executive Committee.',
-    reference: 'APH Ch. II §2.23.3',
   },
   SAC: {
     title: 'Standing Appellate Committee',
     icon: Scale,
     tone: 'amber',
     purpose: 'Considers appeals against Executive Committee decisions. Recommends / does not recommend to the Council, or recommends a further Scrutiny / EVC whose reports return to the SAC.',
-    reference: 'APH Ch. I §1.11(b)-(e); Ch. II §2.24(b)-(f)',
   },
   COUNCIL: {
     title: 'Council',
     icon: Gavel,
     tone: 'green',
     purpose: 'Takes the final decision on appeals after the SAC recommendation. Its decision is uploaded on the portal and is final.',
-    reference: 'APH Ch. I §1.11(e); Ch. II §2.24(f)',
   },
 };
 const OUTCOME: Record<string, string> = {
@@ -83,7 +79,7 @@ export function CommitteeDashboard() {
             <Badge t={desk.tone}>
               <Icon className="h-3 w-3" /> {desk.title}
             </Badge>
-            <span>Acts under {desk.reference}. The portal records proceedings; it never decides on its own.</span>
+            <span>The portal records proceedings; it never decides on its own.</span>
           </div>
           <KpiRow>
             <Kpi label="Before the committee" value={data.kpis.pending} tone="blue" caption="Cases formally referred and pending" />
@@ -252,7 +248,6 @@ export function CommitteeCase() {
                       <Badge t={f.finding === 'DEFICIENT' ? 'red' : 'violet'}>{human(f.finding)}</Badge>
                     </div>
                     {f.observation && <p className="mt-1 text-slate-700">{f.observation}</p>}
-                    <div className="mt-0.5 text-xs text-slate-500">APH Ch. I §1.9(c)-(g)</div>
                   </li>
                 ))}
               </ul>
@@ -384,7 +379,7 @@ export function CommitteeCase() {
           </Card>
         </div>
       </div>
-      <PageNote>{desk.title} · {desk.reference}. Automated findings are inputs to the committee; they are not decisions.</PageNote>
+      <PageNote>{desk.title}. Automated findings are inputs to the committee; they are not decisions.</PageNote>
     </>
   );
 }
@@ -447,7 +442,7 @@ function ActionPanel({ data, role, onDone }: { data: any; role: string; onDone: 
   if (role === 'SHC_MEMBER')
     return (
       <Card>
-        <CardHeader title="SHC recommendation" subtitle="Placed before the Executive Committee (Ch. II §2.23.3). Not a decision." divided />
+        <CardHeader title="SHC recommendation" subtitle="Placed before the Executive Committee. Not a decision." divided />
         <div className="space-y-3 p-5">
           <div>
             <Label htmlFor="o" required>Recommendation</Label>
@@ -471,7 +466,7 @@ function ActionPanel({ data, role, onDone }: { data: any; role: string; onDone: 
     if (a.status === 'APPEAL_SUBMITTED')
       return (
         <Card>
-          <CardHeader title="Appeal received" subtitle="Ch. II §2.24(b); Ch. I §1.11(b)" divided />
+          <CardHeader title="Appeal received" divided />
           <div className="p-5">
             <Button className="w-full" loading={busy} onClick={() => act('START_APPEAL_REVIEW', {}, 'Appeal taken up by the SAC.')}>Take up appeal</Button>
           </div>
@@ -480,7 +475,7 @@ function ActionPanel({ data, role, onDone }: { data: any; role: string; onDone: 
     if (a.status === 'AWAITING_AUTHORISED_DECISION')
       return (
         <Card>
-          <CardHeader title="Further committee reports received" subtitle="Reports of the Scrutiny / EVC you ordered return to the SAC (Ch. I §1.11(d))" divided />
+          <CardHeader title="Further committee reports received" subtitle="Reports of the Scrutiny / EVC you ordered return to the SAC" divided />
           <div className="p-5">
             <Button className="w-full" loading={busy} onClick={() => act('RETURN_TO_SAC', {}, 'Placed before the SAC again.')}>Place before the SAC</Button>
           </div>
@@ -488,7 +483,7 @@ function ActionPanel({ data, role, onDone }: { data: any; role: string; onDone: 
       );
     return (
       <Card>
-        <CardHeader title="SAC recommendation" subtitle="To the Council, or for a further Scrutiny / EVC (Ch. I §1.11(d)-(e); Ch. II §2.24(f)). Not a decision." divided />
+        <CardHeader title="SAC recommendation" subtitle="To the Council, or for a further Scrutiny / EVC. Not a decision." divided />
         <div className="space-y-3 p-5">
           <div>
             <Label htmlFor="o" required>Recommendation</Label>
@@ -514,7 +509,6 @@ function ActionPanel({ data, role, onDone }: { data: any; role: string; onDone: 
     <Card>
       <CardHeader
         title={data.committee === 'COUNCIL' ? 'Record the Council decision (final)' : 'Record the Executive Committee decision'}
-        subtitle={data.committee === 'COUNCIL' ? 'Ch. I §1.11(e)-(g); Ch. II §2.24(f)' : 'Ch. I §1.10(a)-(c); Ch. II §2.23.3'}
         divided
       />
       <div className="space-y-3 p-5">

@@ -229,7 +229,7 @@ export default function ApplicationDetail() {
                 )}
                 {['READY_FOR_RE_SCRUTINY', 'UNDER_RE_SCRUTINY'].includes(a.status) && (
                   <Alert kind="info" title="Re-scrutiny">
-                    {a.status === 'READY_FOR_RE_SCRUTINY' ? 'Your corrections are waiting for re-scrutiny.' : 'Re-scrutiny is in progress. Only the items in the notice are verified (Ch. I §1.8(g)).'}
+                    {a.status === 'READY_FOR_RE_SCRUTINY' ? 'Your corrections are waiting for re-scrutiny.' : 'Re-scrutiny is in progress. Only the items in the notice are verified.'}
                   </Alert>
                 )}
                 {data.notices.length > 1 && (
@@ -280,7 +280,7 @@ export default function ApplicationDetail() {
                     <div className="font-semibold">EVC report v{r.version} · {fmtDateTime(r.submitted_at)}</div>
                     <div className="mt-2"><span className="text-xs text-slate-500">Recommendation</span><p>{r.recommendation}</p></div>
                     <div className="mt-2"><span className="text-xs text-slate-500">Observations</span><p className="whitespace-pre-wrap">{r.observations}</p></div>
-                    <p className="mt-2 text-xs text-slate-500">Reports are made available to institutions (Ch. I §1.9(h)); internal evidence references are not disclosed.</p>
+                    <p className="mt-2 text-xs text-slate-500">Reports are made available to institutions; internal evidence references are not disclosed.</p>
                   </div>
                 ))}
               </div>
@@ -300,7 +300,7 @@ export default function ApplicationDetail() {
             )}
             {tab === 'compliance' && (
               <div className="space-y-2">
-                {data.obligations.length === 0 && <Empty title="No compliance obligations">Obligations are created only where the APH establishes them.</Empty>}
+                {data.obligations.length === 0 && <Empty title="No compliance obligations">Obligations are created only where a regulatory provision establishes them.</Empty>}
                 {data.obligations.map((o: any) => (
                   <div key={o.id} className="flex flex-wrap items-center gap-3 rounded-lg border border-slate-200 p-3 text-sm">
                     <div className="min-w-0 flex-1">
@@ -353,7 +353,7 @@ export default function ApplicationDetail() {
 
       <Modal open={reopen} onClose={() => setReopen(false)} title="Request one-time reopening">
         <div className="space-y-3 text-sm">
-          <Alert kind="info">If an application was wrongly submitted, it may be reopened ONE time with competent authority approval. Attach the Format 3 resolution (Ch. II §2.3.3(d)-(e)).</Alert>
+          <Alert kind="info">If an application was wrongly submitted, it may be reopened ONE time with competent authority approval. Attach the Format 3 resolution.</Alert>
           <div>
             <Label htmlFor="rr" required>Reason</Label>
             <textarea id="rr" rows={3} className={inputCls} value={reopenReason} onChange={(e) => setReopenReason(e.target.value)} />
@@ -470,7 +470,7 @@ function CommitteePanel({ data, onDone }: { data: any; onDone: (kind: 'success' 
       )}
       {holder && (
         <div className="space-y-3 border-t border-slate-100 p-5">
-          <Label htmlFor="cs" required hint={holder === 'SHC' ? 'Compliance for the shortcomings (Ch. II §2.23.3)' : holder === 'SAC' ? 'Supporting documents for the appeal' : 'Your clarification'}>
+          <Label htmlFor="cs" required hint={holder === 'SHC' ? 'Compliance for the shortcomings' : holder === 'SAC' ? 'Supporting documents for the appeal' : 'Your clarification'}>
             Submit to the {COMMITTEE_NAME[holder]}
           </Label>
           <textarea id="cs" rows={3} className={inputCls} value={note} onChange={(e) => setNote(e.target.value)} placeholder="Describe what you are submitting" />

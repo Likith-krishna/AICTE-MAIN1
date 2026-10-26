@@ -585,13 +585,13 @@ export async function appealEligibility(db: Db, app: AppRow, now = new Date()): 
   const aphReference = chapterI ? 'Ch. I §1.11(a)' : 'Ch. II §2.24(a)';
   const base = { decisionId: null, deadlineAt: null, deadlineBasis: null, aphReference };
   const existing = await db.one('SELECT 1 FROM appeals WHERE application_id = $1', [app.id]);
-  if (existing) return { ...base, eligible: false, reason: 'An appeal has already been filed. The APH allows an appeal once.' };
+  if (existing) return { ...base, eligible: false, reason: 'An appeal has already been filed. Only one appeal is allowed.' };
   const d = await db.one<{ id: string; decision_type: string; decision_body: string; decision_date: string; uploaded_at: string; is_appeal_outcome: boolean }>(
     'SELECT id, decision_type, decision_body, decision_date::text AS decision_date, uploaded_at, is_appeal_outcome FROM decisions WHERE application_id = $1 ORDER BY uploaded_at DESC LIMIT 1',
     [app.id],
   );
   if (!d) return { ...base, eligible: false, reason: 'No decision has been issued yet.' };
-  if (d.is_appeal_outcome || d.decision_body !== 'EXECUTIVE_COMMITTEE') return { ...base, eligible: false, reason: 'The Council’s decision on appeal is final (Ch. I §1.11(e); Ch. II §2.24(f)).' };
+  if (d.is_appeal_outcome || d.decision_body !== 'EXECUTIVE_COMMITTEE') return { ...base, eligible: false, reason: 'The Council’s decision on appeal is final.' };
   if (app.status !== 'DECISION_ISSUED') return { ...base, eligible: false, reason: 'Appeals can be filed only while the decision stands issued.' };
   let start: string;
   let basis: string;
@@ -600,7 +600,7 @@ export async function appealEligibility(db: Db, app: AppRow, now = new Date()): 
       return {
         ...base,
         eligible: false,
-        reason: 'For new institutions Ch. I §1.11(a) provides an appeal within 7 days from the issue of a Letter of Deficiency (LoD). Appeals against other decisions are not configured pending verification.',
+        reason: 'For new institutions, an appeal is allowed within 7 days from the issue of a Letter of Deficiency (LoD). Appeals against other decisions are not configured pending verification.',
       };
     start = d.decision_date;
     basis = `7 days from the date of issue of the LoD (${d.decision_date})`;

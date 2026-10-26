@@ -233,10 +233,10 @@ export function nextActionFor(status: AppState): string {
     case 'EVC_SCHEDULED':
       return 'Prepare for the scheduled EVC visit.';
     case 'AWAITING_COMMITTEE_REVIEW':
-      return 'Submit your compliance for the shortcomings to the Standing Hearing Committee and follow any hearing notice (Ch. II §2.23.3).';
+      return 'Submit your compliance for the shortcomings to the Standing Hearing Committee and follow any hearing notice.';
     case 'APPEAL_SUBMITTED':
     case 'APPEAL_UNDER_REVIEW':
-      return 'Follow the Standing Appellate Committee schedule and keep the supporting documents ready (Ch. I §1.11(b)-(c); Ch. II §2.24(b)-(c)).';
+      return 'Follow the Standing Appellate Committee schedule and keep the supporting documents ready.';
     case 'DECISION_ISSUED':
       return 'Review the decision and its eligibility for appeal shown on the Decisions page.';
     default:
@@ -460,7 +460,7 @@ export function institutionRouter(db: Db, storage: Storage) {
     ah(async (req, res) => {
       const u = user(req);
       const app = await loadAppFor(db, u, req.params.id, req);
-      if (app.status !== 'DRAFT') throw new HttpError(409, 'NOT_EDITABLE', 'Only drafts can be edited. After final submission, data cannot be edited while processing is ongoing (Ch. II §2.3.3(c)).');
+      if (app.status !== 'DRAFT') throw new HttpError(409, 'NOT_EDITABLE', 'Only drafts can be edited. After final submission, data cannot be edited while processing is ongoing.');
       const body = z
         .object({
           rowVersion: z.number().int(),
@@ -567,7 +567,7 @@ export function institutionRouter(db: Db, storage: Storage) {
       const app0 = await loadAppFor(db, u, req.params.id, req);
       const cat = categoryOrThrow(app0.category_code);
       if (!cat.submissionEnabled)
-        throw new HttpError(409, 'CATEGORY_NOT_VERIFIED', 'Final submission is disabled for this category until its checklist is verified against the APH. Your draft is saved.');
+        throw new HttpError(409, 'CATEGORY_NOT_VERIFIED', 'Final submission is disabled for this category until its checklist is verified. Your draft is saved.');
       const inst = await db.one<Record<string, string>>('SELECT * FROM institutions WHERE id = $1', [app0.institution_id]);
       const missingProfile = ['name', 'address', 'official_email', 'applicant_name', 'applicant_designation'].filter((k) => !inst?.[k]);
       if (missingProfile.length) throw new HttpError(422, 'PROFILE_INCOMPLETE', 'Complete your Institution Profile (address, official email, applicant name and designation) before submitting.', { missing: missingProfile });
@@ -619,7 +619,7 @@ export function institutionRouter(db: Db, storage: Storage) {
       const app = await loadAppFor(db, u, req.params.id, req);
       const { reason } = z.object({ reason: z.string().trim().min(10).max(2000) }).parse(req.body);
       if (app.status !== 'SUBMITTED') throw new HttpError(409, 'NOT_REOPENABLE', 'Reopening can be requested only before processing has started.');
-      if (app.reopen_count >= 1) throw new HttpError(409, 'REOPEN_USED', 'An application can be reopened only ONE time (Ch. II §2.3.3(e)).');
+      if (app.reopen_count >= 1) throw new HttpError(409, 'REOPEN_USED', 'An application can be reopened only ONE time.');
       const stored = await storeUpload(storage, req.file);
       await db.query('UPDATE applications SET reopen_requested_at = now(), reopen_request_reason = $2 WHERE id = $1', [app.id, reason]);
       await audit(db, req, 'REOPEN_REQUESTED', 'application', app.id, { reason, resolutionKey: stored.key, resolutionName: stored.name, sha256: stored.sha256 }, app.institution_id);

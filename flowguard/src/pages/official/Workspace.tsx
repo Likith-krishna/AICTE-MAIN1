@@ -1,4 +1,4 @@
-import { AlertTriangle, ArrowLeft, CheckCircle2, Download, ExternalLink, FileText, Lock, ShieldAlert, XCircle } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, CheckCircle2, Download, ExternalLink, FileText, ShieldAlert, XCircle } from 'lucide-react';
 import { useEffect, useState, type ReactNode } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Alert, Badge, Button, Card, CardHeader, cx, Empty, inputCls, KV, Label, PageHeader, PageNote, Spinner, StatusBadge, Table, Tabs, tdCls, TextLink, Timeline } from '../../components/ui';
@@ -259,7 +259,7 @@ export function OfficialApplication() {
     );
   if (role === 'SHC_MEMBER' && s === 'AWAITING_COMMITTEE_REVIEW')
     actions.push(
-      <Panel key="shc" title="Record SHC outcome (Ch. II §2.23.3)">
+      <Panel key="shc" title="Record SHC outcome">
         <F label="Outcome" required><select className={inputCls} value={f.outcome} onChange={(e) => set('outcome', e.target.value)}><option value="">Select…</option><option value="COMPLIANCE_SATISFACTORY">Compliance satisfactory</option><option value="PARTIAL">Partial</option><option value="COMPLIANCE_NOT_SATISFACTORY">Compliance not satisfactory</option></select></F>
         <F label="Notes" required><textarea rows={3} className={inputCls} value={f.notes ?? ''} onChange={(e) => set('notes', e.target.value)} /></F>
         <Button loading={busy === 'RECORD_SHC_OUTCOME'} onClick={() => act('RECORD_SHC_OUTCOME', { outcome: f.outcome, notes: f.notes })}>Record and forward to EC</Button>
@@ -268,7 +268,7 @@ export function OfficialApplication() {
   if (role === 'DECISION_AUTHORITY') {
     if (s === 'SUBMITTED' && a.reopen_requested_at)
       actions.push(
-        <Panel key="ro" title="Reopen request (Ch. II §2.3.3(d)-(e))">
+        <Panel key="ro" title="Reopen request">
           <p className="text-sm">{a.reopen_request_reason}</p>
           <ReasonAction label="Approve one-time reopening" busy={busy === 'APPROVE_REOPEN'} onSubmit={(reason) => act('APPROVE_REOPEN', { reason })} />
           <ReasonAction variant="secondary" label="Decline reopening" busy={busy === 'DECLINE_REOPEN'} onSubmit={(reason) => act('DECLINE_REOPEN', { reason })} />
@@ -316,18 +316,18 @@ export function OfficialApplication() {
         </F>
         <F label="Observation" required><textarea rows={2} className={inputCls} value={f.explanation ?? ''} onChange={(e) => set('explanation', e.target.value)} /></F>
         <F label="Required correction" required><input className={inputCls} value={f.correctiveAction ?? ''} onChange={(e) => set('correctiveAction', e.target.value)} /></F>
-        <F label="Source reference"><input className={inputCls} value={f.sourceReference ?? ''} onChange={(e) => set('sourceReference', e.target.value)} placeholder="e.g. Annexure 2 §2.10(i)" /></F>
+        <F label="Source reference"><input className={inputCls} value={f.sourceReference ?? ''} onChange={(e) => set('sourceReference', e.target.value)} placeholder="e.g. clause or policy reference" /></F>
         <F label="Deadline">
           <select className={inputCls} value={f.deadlineType} onChange={(e) => set('deadlineType', e.target.value)}>
             <option value="NOT_CONFIGURED">No deadline — requires authorised configuration</option>
-            <option value="OPERATIONAL">Operational deadline (system-configured, not APH)</option>
-            <option value="APH">APH-prescribed deadline (cite the clause)</option>
+            <option value="OPERATIONAL">Operational deadline (system-configured)</option>
+            <option value="APH">Regulatory deadline (cite the clause)</option>
           </select>
         </F>
         {f.deadlineType !== 'NOT_CONFIGURED' && (
           <div className="grid gap-3 sm:grid-cols-2">
             <F label="Date" required><input type="date" className={inputCls} value={f.deadline ?? ''} onChange={(e) => set('deadline', e.target.value)} /></F>
-            <F label="Basis" required><input className={inputCls} value={f.deadlineBasis ?? ''} onChange={(e) => set('deadlineBasis', e.target.value)} placeholder={f.deadlineType === 'APH' ? 'APH clause' : 'Who configured it and why'} /></F>
+            <F label="Basis" required><input className={inputCls} value={f.deadlineBasis ?? ''} onChange={(e) => set('deadlineBasis', e.target.value)} placeholder={f.deadlineType === 'APH' ? 'Regulatory clause' : 'Who configured it and why'} /></F>
           </div>
         )}
         <Button
@@ -388,13 +388,6 @@ export function OfficialApplication() {
             <F label="Official observation" required={rev.status !== 'EXAMINED_NO_OBSERVATION'}>
               <textarea rows={4} className={inputCls} value={rev.observation} onChange={(e) => setRev({ ...rev, observation: e.target.value })} placeholder="What you checked and what you found" />
             </F>
-            <div>
-              <Label>Regulatory source reference</Label>
-              <div className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-600">
-                <Lock className="h-3.5 w-3.5 shrink-0 text-slate-400" />
-                <span className="truncate">{docDef?.aphReference ?? 'Not stated in the requirement'}</span>
-              </div>
-            </div>
             <Button
               className="w-full"
               loading={busy === 'docrev'}
@@ -735,7 +728,6 @@ export function OfficialApplication() {
                           <div>
                             <div className="font-medium">{c.label}</div>
                             <div className="text-xs text-slate-500">{c.detail}</div>
-                            <div className="text-[11px] text-slate-400">{c.basis === 'APH' ? 'APH' : 'System policy'} · {c.reference}</div>
                           </div>
                         </li>
                       ))}

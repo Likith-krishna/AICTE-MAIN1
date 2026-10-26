@@ -334,7 +334,7 @@ export function EvcScheduleVisit() {
               </div>
               {mode === 'PHYSICAL' && (
                 <div className="sm:col-span-2 lg:col-span-3">
-                  <Label htmlFor="o" required hint="APH Ch. I §1.8 NOTE — EVCs are online unless extraordinary circumstances apply">Extraordinary circumstance</Label>
+                  <Label htmlFor="o" required hint="EVCs are online unless extraordinary circumstances apply">Extraordinary circumstance</Label>
                   <textarea id="o" rows={2} className={inputCls} value={offline} disabled={!editable} onChange={(e) => setOffline(e.target.value)} placeholder="e.g. Court direction (reference)" />
                 </div>
               )}
@@ -411,7 +411,7 @@ export function EvcScheduleVisit() {
             </Table>
             {c.composition && !c.composition.valid && (
               <div className="border-t border-slate-100 px-5 py-3">
-                <Alert kind="warn" title="Committee composition (Annexure 16 §16.5)">
+                <Alert kind="warn" title="Committee composition">
                   <ul className="list-disc pl-5 text-[13px]">
                     {c.composition.findings.filter((f: any) => f.blocking).map((f: any) => <li key={f.id + (f.expertId ?? '')}>{f.message}</li>)}
                   </ul>
