@@ -203,7 +203,7 @@ function Sidebar({ groups, homePath, onNavigate }: { groups: NavGroup[]; homePat
         >
           <LogOut className="h-[17px] w-[17px]" /> Sign out
         </button>
-        <div className="mx-3 mt-3 border-t border-white/10 pt-3 text-[11px] text-slate-500">SIH26262 · AICTE Approval Portal</div>
+        <div className="mx-3 mt-3 border-t border-white/10 pt-3 text-[11px] text-slate-500">AICTE Approval Portal</div>
       </div>
     </>
   );

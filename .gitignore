@@ -13,7 +13,9 @@ flowguard/data/
 !.env.example
 .claude/settings.local.json
 
-# OS / logs
+# OS / logs / temp
 *.log
 .DS_Store
 Thumbs.db
+demo_cookies.txt
+*_cookies.txt

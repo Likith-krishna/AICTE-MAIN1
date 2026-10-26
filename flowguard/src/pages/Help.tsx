@@ -81,7 +81,7 @@ export default function Help() {
           ))}
         </ul>
       </Card>
-      <p className="mt-6 text-center text-xs text-slate-400">This is an SIH26262 prototype. It is not integrated with the official AICTE portal; references it generates are portal tracking IDs.</p>
+      <p className="mt-6 text-center text-xs text-slate-400">This is a prototype. It is not integrated with the official AICTE portal; references it generates are portal tracking IDs.</p>
     </>
   );
 }

@@ -383,7 +383,7 @@ export function PageNote({ children }: { children: ReactNode }) {
   return (
     <div className="mt-8 flex flex-wrap items-center justify-between gap-2 border-t border-slate-200 pt-4 text-xs text-slate-400">
       <span>{children}</span>
-      <span>AICTE Approval Portal · SIH26262</span>
+      <span>AICTE Approval Portal</span>
     </div>
   );
 }

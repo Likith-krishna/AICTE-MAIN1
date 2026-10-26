@@ -36,7 +36,7 @@ export function renderPdf(d: Doc): Promise<Buffer> {
     pdf.on('error', reject);
     const W = pdf.page.width - 100;
     pdf.fillColor('#10213f').font('Helvetica-Bold').fontSize(16).text('AICTE Approval Portal');
-    pdf.font('Helvetica').fontSize(9).fillColor('#64748b').text('Unified Approval Workflow & Compliance Management Portal (SIH26262 prototype)');
+    pdf.font('Helvetica').fontSize(9).fillColor('#64748b').text('Unified Approval Workflow & Compliance Management Portal');
     pdf.moveDown(0.8);
     pdf.fillColor('#0f172a').font('Helvetica-Bold').fontSize(14).text(ascii(d.title));
     pdf.font('Helvetica').fontSize(10).fillColor('#334155').text(ascii(d.subtitle));
