@@ -17,7 +17,7 @@ Options (environment variables):
 | Variable | Default | Effect |
 |---|---|---|
 | `DEMO_HEADED` | `0` | `1` shows the browser window while it runs |
-| `DEMO_PACE` | `1` | Multiplies the reading pauses (e.g. `1.5` for a slower video) |
+| `DEMO_PACE` | `1` | Slows everything: pauses, cursor travel, typing and title cards, plus a reading pause after each caption when above 1. `2` gives a ~12-minute walkthrough; use it with a large `DEMO_TARGET_SECONDS` so no sped-up cut is made |
 | `DEMO_TARGET_SECONDS` | `300` | Length of the sped-up cut; set high to skip it |
 | `DEMO_BASE_URL` | `http://localhost:3000` | Portal address |
 | `DEMO_APPLICANT_PASSWORD`, `DEMO_OFFICIAL_PASSWORD` | seeded dev passwords | Account passwords |

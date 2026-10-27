@@ -194,6 +194,8 @@ const wait = (ms) => page.waitForTimeout(ms * PACE);
 async function caption(tag, text) {
   timeline.push({ at: elapsed(), tag, text });
   await page.evaluate((c) => window.__setCaption?.(c), { tag, text }).catch(() => {});
+  // Slower paces give the viewer time to read each caption before the next action starts.
+  if (PACE > 1) await page.waitForTimeout(Math.min(text.length * 45, 4500) * (PACE - 1));
 }
 
 async function pointAt(loc) {
@@ -203,7 +205,7 @@ async function pointAt(loc) {
   const x = b.x + Math.min(b.width / 2, 60);
   const y = b.y + b.height / 2;
   await page.evaluate(([x, y]) => window.__moveCursor?.(x, y), [x, y]);
-  await page.waitForTimeout(470);
+  await page.waitForTimeout(470 * PACE);
   return { x, y };
 }
 
@@ -218,7 +220,7 @@ async function click(loc, after = 350) {
 async function type(loc, text) {
   await click(loc, 60);
   await loc.fill('');
-  await loc.pressSequentially(String(text), { delay: 12 });
+  await loc.pressSequentially(String(text), { delay: Math.round(12 * PACE) });
   await wait(120);
 }
 
@@ -264,7 +266,7 @@ async function titleCard(title, subtitle, bullets = [], ms = 5000) {
       <p style="font-size:28px;color:#cbd5e1;margin:0 0 30px">${subtitle}</p>
       ${bullets.map((b) => `<div style="font-size:24px;color:#e2e8f0;margin:12px 0;padding-left:26px;border-left:4px solid #f59e0b">${b}</div>`).join('')}
     </div></body></html>`);
-  await page.waitForTimeout(ms);
+  await page.waitForTimeout(ms * PACE);
 }
 
 async function signOut() {
