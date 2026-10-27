@@ -100,24 +100,32 @@ Configured in `.env`:
 
 ## Demo accounts
 
-Seeded for development and demonstration only (passwords are in `server/db/seed.ts`). Applicants use `Applicant@2026`; officials use `Official@2026`.
+Sign in at http://localhost:3000 with any of these accounts. They are seeded for development and demonstration only (defined in `server/db/seed.ts`); set `SEED_DEMO=false` in any real deployment so they are not created.
 
-| Login ID | Role |
-|---|---|
-| `applicant.demo` | Institution applicant — Demo Institute of Technology, Pune |
-| `applicant.sample` | Institution applicant — second institution (tests data isolation) |
-| `scrutiny.officer`, `scrutiny.officer2` | Scrutiny official |
-| `rescrutiny.officer` | Re-scrutiny official |
-| `regional.officer`, `regional.officer2` | Regional Officer / EVC coordinator (West and South demo regions) |
-| `evc.member`, `evc.member2`, `evc.member3` | EVC members (Academician, Expert member, Architect / Planning) |
-| `ec.official` | Executive Committee — records first-instance decisions |
-| `council.official` | Council — records decisions on appeal |
-| `shc.member`, `sac.member` | Standing Hearing / Appellate Committee |
-| `decision.authority` | Reopen approvals and closing applications after the appeal window |
-| `regulation.bureau` | Regulation Bureau: escalations, expert verification |
-| `supervisor` | Oversight, assignment, verification requests, EVC handoff |
-| `sys.admin` | Notification delivery, retries, background jobs |
-| `rules.governance`, `rules.publisher` | Rule verifier and second approver |
+| Role | Login ID | Password |
+|---|---|---|
+| Institution applicant — Demo Institute of Technology, Pune | `applicant.demo` | `Applicant@2026` |
+| Institution applicant — second institution (tests data isolation) | `applicant.sample` | `Applicant@2026` |
+| Scrutiny official | `scrutiny.officer` | `Official@2026` |
+| Scrutiny official (second, tests assignment locking) | `scrutiny.officer2` | `Official@2026` |
+| Re-scrutiny official | `rescrutiny.officer` | `Official@2026` |
+| Regional Officer / EVC coordinator (West demo region) | `regional.officer` | `Official@2026` |
+| Regional Officer / EVC coordinator (South demo region) | `regional.officer2` | `Official@2026` |
+| EVC member — Academician | `evc.member` | `Official@2026` |
+| EVC member — Expert member | `evc.member2` | `Official@2026` |
+| EVC member — Architect / Planning | `evc.member3` | `Official@2026` |
+| Executive Committee — records first-instance decisions | `ec.official` | `Official@2026` |
+| Council — records decisions on appeal | `council.official` | `Official@2026` |
+| Standing Hearing Committee | `shc.member` | `Official@2026` |
+| Standing Appellate Committee | `sac.member` | `Official@2026` |
+| Decision authority — reopen approvals, closing after the appeal window | `decision.authority` | `Official@2026` |
+| Regulation Bureau — escalations, expert verification | `regulation.bureau` | `Official@2026` |
+| Supervisor — oversight, assignment, verification requests, EVC handoff | `supervisor` | `Official@2026` |
+| System administrator — notification delivery, retries, background jobs | `sys.admin` | `Official@2026` |
+| Rules governance — rule verifier | `rules.governance` | `Official@2026` |
+| Rules governance — second approver | `rules.publisher` | `Official@2026` |
+
+To walk through the main workflow, use them in this order: `applicant.demo` → `scrutiny.officer` → `rescrutiny.officer` → `regional.officer` → `evc.member` / `evc.member2` / `evc.member3` → `regional.officer` → `ec.official`.
 
 Demo regions, registry experts (`EVC-DEMO-0001`–`0004`, where 0004 is deliberately unverified) and operational settings are labelled as sample data in the UI.
 
