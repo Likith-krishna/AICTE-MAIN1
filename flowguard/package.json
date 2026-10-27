@@ -10,7 +10,8 @@
     "start": "cross-env NODE_ENV=production tsx server/index.ts",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "db:reset": "tsx server/db/reset.ts"
+    "db:reset": "tsx server/db/reset.ts",
+    "demo": "node demo/run-demo.mjs"
   },
   "dependencies": {
     "@electric-sql/pglite": "0.2.17",
@@ -39,6 +40,7 @@
     "@types/supertest": "6.0.2",
     "@vitejs/plugin-react": "4.3.4",
     "cross-env": "7.0.3",
+    "playwright": "^1.48.2",
     "supertest": "^7.1.4",
     "tailwindcss": "^4.1.11",
     "tsx": "4.19.2",
