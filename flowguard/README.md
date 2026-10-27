@@ -12,6 +12,7 @@ The portal takes an institution's application from draft through scrutiny, re-sc
 - [Tech stack](#tech-stack)
 - [Quick start](#quick-start)
 - [Database: Supabase or embedded](#database-supabase-or-embedded)
+- [Deployment](#deployment)
 - [Demo accounts](#demo-accounts)
 - [Application workflow](#application-workflow)
 - [Rules engine](#rules-engine)
@@ -92,11 +93,39 @@ Configured in `.env`:
 | `STORAGE_DIR` | Private document storage (default `./data/storage`); never served statically |
 | `SEED_DEMO` | `false` disables demo institutions and test accounts |
 | `PORT` | HTTP port (default 3000) |
+| `TRUST_PROXY` | Number of proxy hops in front of the app (usually `1` on a host) so rate limits see the real client IP |
 | `SWEEP_INTERVAL_MS`, `ESCALATE_AFTER_OVERDUE_DAYS`, `DISABLE_SCHEDULER` | Background sweep settings (system policy, not APH) |
 
 **Supabase:** use the **Session pooler** connection string (Project Settings → Database → Connect → Session pooler, port 5432). The direct `db.<ref>.supabase.co` host is IPv6-only and fails on IPv4 networks. SSL is enabled automatically for `supabase.com` hosts. Pick the region closest to your users (the reference deployment uses Mumbai, `ap-south-1`). After the first start, run `supabase/rls.sql` in the SQL editor: it enables row-level security and revokes the `anon` / `authenticated` roles on every table, so data is reachable only through this API. Re-run it after migrations that add tables.
 
 `npm run db:reset` deletes the **local** embedded database and storage only; it refuses to run when `DATABASE_URL` is set.
+
+## Deployment
+
+The app is one Node.js service (API and UI on one port) that lives in the `flowguard/` folder of the repository. Any Node host works (Render, Railway, a VM or a container).
+
+| Setting | Value |
+|---|---|
+| Root directory | `flowguard` |
+| Node version | 20 or later (`engines` in `package.json`) |
+| Build command | `npm ci && npm run build` |
+| Start command | `npm start` |
+| Health check | `GET /api/auth/me` (returns 401 when signed out, which means the server is up) |
+
+Environment variables on the host:
+
+| Variable | Value |
+|---|---|
+| `DATABASE_URL` | Supabase Session pooler connection string |
+| `TRUST_PROXY` | `1` (the host's load balancer is one hop) |
+| `SEED_DEMO` | `true` for a demo deployment with the test accounts; `false` for real use |
+| `STORAGE_DIR` | A path on a persistent disk (see below) |
+
+Do not set `NODE_ENV` on the host: `npm start` sets `production` itself, and setting it during the build makes npm skip the build tools. The host provides `PORT`. Production mode serves the built UI from `dist/`, sets Secure cookies (so the site must be served over HTTPS, which hosts provide) and starts the background sweep; run a single instance so the sweep does not run twice.
+
+**Uploaded documents are stored on the server's disk** (`STORAGE_DIR`). On hosts with an ephemeral filesystem (for example Render's free tier), attach a persistent disk and point `STORAGE_DIR` at it, or uploads are lost on every redeploy. The database itself is in Supabase and is unaffected.
+
+After the first deployment, run `supabase/rls.sql` once in the Supabase SQL editor.
 
 ## Demo accounts
 

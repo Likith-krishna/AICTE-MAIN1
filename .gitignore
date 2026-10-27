@@ -19,3 +19,6 @@ flowguard/data/
 Thumbs.db
 demo_cookies.txt
 *_cookies.txt
+
+# Local AI-tool settings
+.claude/

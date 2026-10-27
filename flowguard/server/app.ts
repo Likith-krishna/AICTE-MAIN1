@@ -28,7 +28,9 @@ export function createApp({ db, storage, secureCookies = false, silent = false, 
   const log = makeLogger(silent);
   const app = express();
   app.disable('x-powered-by');
-  app.set('trust proxy', 'loopback');
+  // Behind a hosting proxy, req.ip (used by the rate limits) must come from X-Forwarded-For; set TRUST_PROXY to the hop count (e.g. 1).
+  const tp = process.env.TRUST_PROXY;
+  app.set('trust proxy', !tp ? 'loopback' : /^\d+$/.test(tp) ? Number(tp) : tp === 'true' ? true : tp);
   app.use((req, res, next) => {
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('Referrer-Policy', 'same-origin');

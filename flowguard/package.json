@@ -2,8 +2,11 @@
   "name": "aicte-flowguard",
   "private": true,
   "version": "1.0.0",
-  "description": "AICTE FlowGuard — Unified Approval Workflow & Compliance Management Portal (SIH26262)",
+  "description": "AICTE Approval Portal — integrated approval workflow and institutional compliance monitoring (SIH26262)",
   "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "tsx server/index.ts",
     "build": "vite build",
@@ -16,6 +19,7 @@
   "dependencies": {
     "@electric-sql/pglite": "0.2.17",
     "cookie-parser": "1.4.7",
+    "cross-env": "7.0.3",
     "dotenv": "16.4.7",
     "express": "4.21.2",
     "lucide-react": "0.468.0",
@@ -25,6 +29,7 @@
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "react-router-dom": "7.1.1",
+    "tsx": "4.19.2",
     "zod": "3.24.1"
   },
   "devDependencies": {
@@ -39,11 +44,9 @@
     "@types/react-dom": "19.0.2",
     "@types/supertest": "6.0.2",
     "@vitejs/plugin-react": "4.3.4",
-    "cross-env": "7.0.3",
     "playwright": "^1.48.2",
     "supertest": "^7.1.4",
     "tailwindcss": "^4.1.11",
-    "tsx": "4.19.2",
     "typescript": "5.7.2",
     "vite": "6.0.7",
     "vitest": "2.1.8"
